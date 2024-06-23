@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   hr-monitor-backend:
     build:
@@ -8,8 +6,6 @@ services:
       - "8000:8000"
     environment:
       - KAFKA_BROKER=${KAFKA_BROKER}
-    networks:
-      - kafka-net
 
   hr-monitor-frontend:
     image: nginx:alpine
@@ -17,9 +13,3 @@ services:
       - ./hr-monitor-frontend:/usr/share/nginx/html:ro
     ports:
       - "5000:80"
-    networks:
-      - kafka-net
-
-networks:
-  kafka-net:
-    external: true

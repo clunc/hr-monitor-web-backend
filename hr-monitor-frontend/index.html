@@ -13,7 +13,7 @@
         const ws = new WebSocket("ws://localhost:8000/ws");
         const heartRateDataElement = document.getElementById('heartRateData');
 
-        ws.onopen = functin(event) {
+        ws.onopen = function(event) {
             console.log("Connected to WebSocket server");
         };
 
@@ -31,18 +31,6 @@
             listItem.textContent = `${message.heart_rate} bpm at ${message.timestamp} (Latency: ${latency} ms)`;
             heartRateDataElement.appendChild(listItem);
         };
-
-        // Example function to send messages with a timestamp from the frontend
-        function sendMessage() {
-            const message = {
-                heart_rate: 70, // Example heart rate value
-                timestamp: new Date().toISOString()
-            };
-            ws.send(JSON.stringify(message));
-        }
-
-        // For testing purposes, send a message every 5 seconds
-        setInterval(sendMessage, 5000);
     </script>
 </body>
 </html>

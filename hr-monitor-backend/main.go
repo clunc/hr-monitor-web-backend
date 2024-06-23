@@ -1,6 +1,7 @@
 package main
 
 import (
+    "encoding/json"
     "fmt"
     "log"
     "net/http"
@@ -107,8 +108,14 @@ func consumeKafkaMessages() {
             ev := c.Poll(100)
             switch e := ev.(type) {
             case *kafka.Message:
-                fmt.Printf("Message on %s: %s\n", e.TopicPartition, string(e.Value))
-                broadcast <- e.Value
+                log.Printf("Received message on %s: %s\n", e.TopicPartition, string(e.Value))
+                // Process the message
+                if isValidMessage(e.Value) {
+                    log.Printf("Broadcasting valid message: %s\n", string(e.Value))
+                    broadcast <- e.Value
+                } else {
+                    log.Printf("Invalid message filtered out: %s\n", string(e.Value))
+                }
             case kafka.Error:
                 fmt.Fprintf(os.Stderr, "%% Error: %v\n", e)
                 run = false
@@ -117,4 +124,21 @@ func consumeKafkaMessages() {
             }
         }
     }
+}
+
+// isValidMessage checks the validity of the message content
+func isValidMessage(message []byte) bool {
+    var data map[string]interface{}
+    err := json.Unmarshal(message, &data)
+    if err != nil {
+        log.Printf("Error unmarshalling message: %v\n", err)
+        return false
+    }
+
+    // Add more validation rules as per your requirements
+    if _, ok := data["heart_rate"].(float64); ok {
+        return true
+    }
+    log.Printf("Message does not contain valid heart_rate: %s\n", message)
+    return false
 }
